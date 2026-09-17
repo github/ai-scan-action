@@ -6,7 +6,7 @@ This GitHub AI Scan License (the **"License"**) governs the limited right to dow
 
 <li>
 
-DEFINITIONS
+### DEFINITIONS
 
 <ol>
 <li>
@@ -31,7 +31,7 @@ Definitions. In this License:
 
 <li>
 
-LICENSE GRANT
+### LICENSE GRANT
 
 <ol>
 <li>
@@ -70,7 +70,7 @@ License Conditions. The license is conditioned on and continues only while the C
 
 <li>
 
-RESTRICTIONS
+### RESTRICTIONS
 
 <ol>
 <li>
@@ -100,7 +100,7 @@ Restrictions. Except to the extent required by mandatory law or by an applicable
 
 <li>
 
-PUBLIC REPOSITORY; UNAUTHORIZED DOWNLOADS
+### PUBLIC REPOSITORY; UNAUTHORIZED DOWNLOADS
 
 <ol>
 <li>Distribution Mechanism Only. GitHub may host the Runtime in a publicly accessible repository solely so that GitHub Actions workflows can download and execute it. Public accessibility is a distribution mechanism only.</li>
@@ -124,7 +124,7 @@ No Open Source; No Implied Grant. Public availability of the Runtime:
 
 <li>
 
-THIRD-PARTY SOFTWARE
+### THIRD-PARTY SOFTWARE
 
 <ol>
 <li>Third-Party Components. The Runtime may include third-party or open-source components governed by their own license terms. Applicable notices are provided with the Runtime.</li>
@@ -135,7 +135,7 @@ THIRD-PARTY SOFTWARE
 
 <li>
 
-AI SERVICES AND CUSTOMER DATA
+### AI SERVICES AND CUSTOMER DATA
 
 <ol>
 <li>AI Services. The Runtime invokes GitHub-hosted AI and related services. This License does not independently grant access to those services. Use of the services is governed by the Agreement and the applicable product, generative-AI, privacy, and data-protection terms.</li>
@@ -146,7 +146,7 @@ AI SERVICES AND CUSTOMER DATA
 
 <li>
 
-SEPARATELY LICENSED GITHUB PRODUCTS; CODEQL
+### SEPARATELY LICENSED GITHUB PRODUCTS; CODEQL
 
 <ol>
 <li>Separately Licensed Products. GitHub products, services, or components that are separately licensed remain subject to their own terms. This License does not grant rights to any such product, service, or component.</li>
@@ -156,7 +156,7 @@ SEPARATELY LICENSED GITHUB PRODUCTS; CODEQL
 
 <li>
 
-OWNERSHIP
+### OWNERSHIP
 
 <ol>
 <li>Ownership. GitHub and its licensors retain all right, title, and interest in and to the Runtime. The Runtime is licensed, not sold.</li>
@@ -168,7 +168,7 @@ OWNERSHIP
 
 <li>
 
-UPDATES AND TECHNICAL OPERATION
+### UPDATES AND TECHNICAL OPERATION
 
 <ol>
 <li>Updates. GitHub may issue automatic or required Runtime updates, and may replace, deprecate, or discontinue Runtime versions.</li>
@@ -181,14 +181,14 @@ UPDATES AND TECHNICAL OPERATION
 
 <li>
 
-TERM AND TERMINATION
+### TERM AND TERMINATION
 
 <ol>
 <li>Term. This License is effective on the Effective Date and continues only while the Customer has Authorized Access.</li>
 <li>Termination. This License terminates automatically when Authorized Access ends and may be terminated by GitHub for breach or as permitted by the Agreement.</li>
 <li>
 
-Effect of Termination. On termination or expiration:
+### Effect of Termination. On termination or expiration:
 
 <ol type="a">
 <li>Customer must stop using the Runtime;</li>
@@ -206,7 +206,7 @@ Effect of Termination. On termination or expiration:
 
 <li>
 
-WARRANTIES, LIABILITY, AND AGREEMENT HIERARCHY
+### WARRANTIES, LIABILITY, AND AGREEMENT HIERARCHY
 
 <ol>
 <li>Agreement Controls. Warranty disclaimers, liability limitations, indemnities, governing-law, dispute-resolution, export, and trade-compliance obligations are governed by the Agreement and incorporated by reference. Support and service levels are governed by the Agreement and applicable product documentation.</li>
@@ -219,7 +219,7 @@ WARRANTIES, LIABILITY, AND AGREEMENT HIERARCHY
 
 <li>
 
-ACCEPTANCE AND INCORPORATION
+### ACCEPTANCE AND INCORPORATION
 
 <ol>
 <li>
@@ -239,7 +239,7 @@ Acceptance. This License is accepted by the earliest of:
 
 <li>
 
-GENERAL
+### GENERAL
 
 <ol>
 <li>Notices. Notices are given as provided in the Agreement.</li>
