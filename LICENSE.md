@@ -1,185 +1,254 @@
-**GitHub** **AI** **Scan License**
+# **GitHub AI Scan License**
 
-This GitHub AI Scan License (the **"License"**) ****governs the limited right to download and execute the AI Scan as part of GitHub's AI Scan feature. It is entered into between GitHub ("GitHub") and the customer receiving Authorized Access ("Customer"). The License is effective as of the earliest of the Customer's acceptance of the applicable Agreement, receipt of a preview invitation, or first use of the Runtime (the "Effective Date").
+This GitHub AI Scan License (the **"License"**) governs the limited right to download and execute the AI Scan as part of GitHub's AI Scan feature. It is entered into between GitHub ("GitHub") and the customer receiving Authorized Access ("Customer"). The License is effective as of the earliest of the Customer's acceptance of the applicable Agreement, receipt of a preview invitation, or first use of the Runtime (the "Effective Date").
 
-1. **DEFINITIONS**
+<ol>
 
-   1. **Definitions.** In this License:
+<li>
 
-(a) "Agreement" means the applicable written agreement between GitHub and the Customer governing the Customer's use of GitHub products and services, including any Additional Product Terms, Generative AI Services Terms, Data Protection Agreement, and applicable order form.
+### DEFINITIONS
 
-(b) "AI Scan" means GitHub's managed AI-powered security-scanning feature, however branded.
+<ol>
+<li>
 
-(c) "AI Scan Runtime" or "Runtime" means the compiled executable binary, command-line interface, GitHub Action wrapper, and related executable or supporting files distributed by GitHub to enable execution of AI Scan.
+Definitions. In this License:
 
-(d) "Authorized Access" means access granted to the Customer through (i) a written AI Scan preview invitation, (ii) an active AI Scan subscription or entitlement, (iii) an order form, or (iv) a GHAS or Code Security entitlement that includes AI Scan.
+<ol type="a">
+<li>"Agreement" means the applicable written agreement between GitHub and the Customer governing the Customer's use of GitHub products and services, including any Additional Product Terms, Generative AI Services Terms, Data Protection Agreement, and applicable order form.</li>
+<li>"AI Scan" means GitHub's managed AI-powered security-scanning feature, however branded.</li>
+<li>"AI Scan Runtime" or "Runtime" means the compiled executable binary, command-line interface, GitHub Action wrapper, and related executable or supporting files distributed by GitHub to enable execution of AI Scan.</li>
+<li>"Authorized Access" means access granted to the Customer through (i) a written AI Scan preview invitation, (ii) an active AI Scan subscription or entitlement, (iii) an order form, or (iv) a GHAS or Code Security entitlement that includes AI Scan.</li>
+<li>"Authorized Codebase" means a repository or codebase that the Customer owns, controls, develops, maintains, or is otherwise authorized to test.</li>
+<li>"Approved Invocation" means initiation of AI Scan through a GitHub-provided user interface, API, or other mechanism expressly approved by GitHub in documentation.</li>
+<li>"Approved Runner" means a GitHub-hosted runner or, if and to the extent GitHub expressly permits in documentation, an approved self-hosted runner.</li>
+<li>"Customer" means the person or entity receiving Authorized Access under the Agreement.</li>
+</ol>
 
-(e) "Authorized Codebase" means a repository or codebase that the Customer owns, controls, develops, maintains, or is otherwise authorized to test.
+</li>
+</ol>
 
-(f) "Approved Invocation" means initiation of AI Scan through a GitHub-provided user interface, API, or other mechanism expressly approved by GitHub in documentation.
+</li>
 
-(g) "Approved Runner" means a GitHub-hosted runner or, if and to the extent GitHub expressly permits in documentation, an approved self-hosted runner. 
+<li>
 
-(h) "Customer" means the person or entity receiving Authorized Access under the Agreement.
+### LICENSE GRANT
 
-1. **LICENSE GRANT**
+<ol>
+<li>
 
-   1. **Grant.** Subject to the Agreement and the License, GitHub grants Customer a limited, non-exclusive, non-transferable, non-sublicensable, revocable license during the period of Authorized Access to:
+Grant. Subject to the Agreement and the License, GitHub grants Customer a limited, non-exclusive, non-transferable, non-sublicensable, revocable license during the period of Authorized Access to:
 
-(a) permit an approved GitHub Actions workflow associated with an Authorized Codebase to download the unmodified Runtime from the GitHub-designated distribution location;
+<ol type="a">
+<li>permit an approved GitHub Actions workflow associated with an Authorized Codebase to download the unmodified Runtime from the GitHub-designated distribution location;</li>
+<li>make temporary or cached copies of the Runtime that are technically required to execute the workflow;</li>
+<li>execute the unmodified Runtime on an Approved Runner;</li>
+<li>invoke the Runtime only through an Approved Invocation;</li>
+<li>use the Runtime only to scan Authorized Codebases; and</li>
+<li>receive and use security findings generated by AI Scan for the Customer's internal security purposes.</li>
+</ol>
 
-(b) make temporary or cached copies of the Runtime that are technically required to execute the workflow;
+</li>
+<li>Automated Copying and Execution. The license in Section 2.1 expressly permits the automated download, caching, and execution of the Runtime that occurs when a GitHub Actions workflow runs AI Scan on an Approved Runner.</li>
+<li>
 
-(c) execute the unmodified Runtime on an Approved Runner;
+License Conditions. The license is conditioned on and continues only while the Customer maintains:
 
-(d) invoke the Runtime only through an Approved Invocation;
+<ol type="a">
+<li>a valid Agreement;</li>
+<li>Authorized Access;</li>
+<li>applicable enterprise, organization, and repository enablement of AI Scan;</li>
+<li>payment of applicable AI consumption charges;</li>
+<li>compliance with the Customer's model policies and GitHub's approved-model list; and</li>
+<li>compliance with GitHub's Acceptable Use Policies and applicable law.</li>
+</ol>
 
-(e) use the Runtime only to scan Authorized Codebases; and
+</li>
+<li>No Source or Internal Materials. No rights are granted to source code, system prompts, scanning logic, build instructions, tests, evaluation materials, model weights, query logic, or other internal materials of GitHub.</li>
+</ol>
 
-(f) receive and use security findings generated by AI Scan for the Customer's internal security purposes.
+</li>
 
-  1. **Automated Copying and Execution.** The license in Section 2.1 expressly permits the automated download, caching, and execution of the Runtime that occurs when a GitHub Actions workflow runs AI Scan on an Approved Runner.
+<li>
 
-  2. **License Conditions.** The license is conditioned on and continues only while the Customer maintains:
+### RESTRICTIONS
 
-(a) a valid Agreement;
+<ol>
+<li>
 
-(b) Authorized Access;
+Restrictions. Except to the extent required by mandatory law or by an applicable third-party license, Customer must not, and must not allow any third party to:
 
-(c) applicable enterprise, organization, and repository enablement of AI Scan;
+<ol type="a">
+<li>directly invoke or operate the Runtime outside an Approved Invocation;</li>
+<li>modify, adapt, translate, or create derivative works from the Runtime;</li>
+<li>reverse engineer, decompile, disassemble, or otherwise attempt to derive the source code, prompts, or internal operation of the Runtime;</li>
+<li>redistribute, publish, transfer, lend, or sublicense the Runtime;</li>
+<li>sell, lease, or commercially exploit the Runtime;</li>
+<li>offer the Runtime as a standalone or integrated product or hosted scanning service;</li>
+<li>use the Runtime to provide scanning services to third parties;</li>
+<li>bypass authentication, entitlement checks, model policies, consumption meters, technical restrictions, or usage limits;</li>
+<li>remove or alter copyright, trademark, attribution, or proprietary notices;</li>
+<li>scan a repository or codebase that Customer is not authorized to test;</li>
+<li>use the Runtime in violation of law, applicable sanctions, export controls, or the Agreement; or</li>
+<li>use a copied or cached Runtime after Authorized Access ends, except as necessary for ordinary automated technical cleanup.</li>
+</ol>
 
-(d) payment of applicable AI consumption charges;
+</li>
+<li>Mandatory-Law Exception. The restrictions in Section 3.1(c) do not apply to the extent applicable law grants Customer non-waivable rights to reverse engineer for interoperability or similar purposes.</li>
+</ol>
 
-(e) compliance with the Customer's model policies and GitHub's approved-model list; and
+</li>
 
-(f) compliance with GitHub's Acceptable Use Policies and applicable law.
+<li>
 
-  1. **No Source or Internal Materials.** No rights are granted to source code, system prompts, scanning logic, build instructions, tests, evaluation materials, model weights, query logic, or other internal materials of GitHub.
+### PUBLIC REPOSITORY; UNAUTHORIZED DOWNLOADS
 
-1. **RESTRICTIONS**
+<ol>
+<li>Distribution Mechanism Only. GitHub may host the Runtime in a publicly accessible repository solely so that GitHub Actions workflows can download and execute it. Public accessibility is a distribution mechanism only.</li>
+<li>
 
-   1. **Restrictions.** Except to the extent required by mandatory law or by an applicable third-party license, Customer must not, and must not allow any third party to:
+No Open Source; No Implied Grant. Public availability of the Runtime:
 
-(a) directly invoke or operate the Runtime outside an Approved Invocation;
+<ol type="a">
+<li>does not make the Runtime open-source software;</li>
+<li>does not grant any person access to AI Scan or GitHub's AI services;</li>
+<li>does not grant any license to any person who does not have Authorized Access;</li>
+<li>does not create any entitlement based on mere possession of a copy; and</li>
+<li>does not limit GitHub's right to authenticate, authorize, meter, throttle, disable, or reject use of the Runtime or the AI service.</li>
+</ol>
 
-(b) modify, adapt, translate, or create derivative works from the Runtime;
+</li>
+<li>Access Controls. Access to AI Scan services remains subject to authentication, product entitlement, customer model policy, and consumption controls. GitHub may technically block or reject unauthorized use.</li>
+</ol>
 
-(c) reverse engineer, decompile, disassemble, or otherwise attempt to derive the source code, prompts, or internal operation of the Runtime;
+</li>
 
-(d) redistribute, publish, transfer, lend, or sublicense the Runtime;
+<li>
 
-(e) sell, lease, or commercially exploit the Runtime;
+### THIRD-PARTY SOFTWARE
 
-(f) offer the Runtime as a standalone or integrated product or hosted scanning service;
+<ol>
+<li>Third-Party Components. The Runtime may include third-party or open-source components governed by their own license terms. Applicable notices are provided with the Runtime.</li>
+<li>Precedence for Third-Party Components. This License does not restrict rights granted to Customer directly under an applicable open-source or third-party license. If a third-party license conflicts with this License for a specific component, the third-party license controls for that component.</li>
+</ol>
 
-(g) use the Runtime to provide scanning services to third parties;
+</li>
 
-(h) bypass authentication, entitlement checks, model policies, consumption meters, technical restrictions, or usage limits;
+<li>
 
-(i) remove or alter copyright, trademark, attribution, or proprietary notices;
+### AI SERVICES AND CUSTOMER DATA
 
-(j) scan a repository or codebase that Customer is not authorized to test;
+<ol>
+<li>AI Services. The Runtime invokes GitHub-hosted AI and related services. This License does not independently grant access to those services. Use of the services is governed by the Agreement and the applicable product, generative-AI, privacy, and data-protection terms.</li>
+<li>Models and Findings. Model availability is subject to GitHub support and Customer model policies. Security findings may be AI-generated. Product documentation describes relevant processing, retention, and controls.</li>
+</ol>
 
-(k) use the Runtime in violation of law, applicable sanctions, export controls, or the Agreement; or
+</li>
 
-(l) use a copied or cached Runtime after Authorized Access ends, except as necessary for ordinary automated technical cleanup.
+<li>
 
-  1. **Mandatory-Law Exception.** The restrictions in Section 3.1(c) do not apply to the extent applicable law grants Customer non-waivable rights to reverse engineer for interoperability or similar purposes.
+### SEPARATELY LICENSED GITHUB PRODUCTS; CODEQL
 
-1. **PUBLIC REPOSITORY; UNAUTHORIZED DOWNLOADS**
+<ol>
+<li>Separately Licensed Products. GitHub products, services, or components that are separately licensed remain subject to their own terms. This License does not grant rights to any such product, service, or component.</li>
+</ol>
 
-   1. **Distribution Mechanism Only.** GitHub may host the Runtime in a publicly accessible repository solely so that GitHub Actions workflows can download and execute it. Public accessibility is a distribution mechanism only.
+</li>
 
-   2. **No Open Source; No Implied Grant.** Public availability of the Runtime:
+<li>
 
-(a) does not make the Runtime open-source software;
+### OWNERSHIP
 
-(b) does not grant any person access to AI Scan or GitHub's AI services;
+<ol>
+<li>Ownership. GitHub and its licensors retain all right, title, and interest in and to the Runtime. The Runtime is licensed, not sold.</li>
+<li>No Implied Licenses. No licenses are granted by implication, estoppel, or otherwise. GitHub reserves all rights not expressly granted. No source-code rights and no trademark or branding rights are granted.</li>
+<li>Customer Content. Customer retains its rights in its code and other content, subject to the Agreement.</li>
+</ol>
 
-(c) does not grant any license to any person who does not have Authorized Access;
+</li>
 
-(d) does not create any entitlement based on mere possession of a copy; and
+<li>
 
-(e) does not limit GitHub's right to authenticate, authorize, meter, throttle, disable, or reject use of the Runtime or the AI service.
+### UPDATES AND TECHNICAL OPERATION
 
-  1. **Access Controls.** Access to AI Scan services remains subject to authentication, product entitlement, customer model policy, and consumption controls. GitHub may technically block or reject unauthorized use.
+<ol>
+<li>Updates. GitHub may issue automatic or required Runtime updates, and may replace, deprecate, or discontinue Runtime versions.</li>
+<li>Integrity. GitHub may use checksums, signatures, or other integrity controls. Customer must not circumvent them.</li>
+<li>Caching and Cleanup. GitHub Actions may temporarily cache the Runtime. GitHub may remove or invalidate obsolete versions. Direct local use of the Runtime is not supported.</li>
+<li>No Compatibility Promise. GitHub does not promise backward compatibility, a fixed model, continued availability of any version, or any specific feature except as required by the Agreement.</li>
+</ol>
 
-1. **THIRD-PARTY SOFTWARE**
+</li>
 
-   1. **Third-Party Components.** The Runtime may include third-party or open-source components governed by their own license terms. Applicable notices are provided with the Runtime.
+<li>
 
-   2. **Precedence for Third-Party Components.** This License does not restrict rights granted to Customer directly under an applicable open-source or third-party license. If a third-party license conflicts with this License for a specific component, the third-party license controls for that component.
+### TERM AND TERMINATION
 
-2. **AI SERVICES AND CUSTOMER DATA**
+<ol>
+<li>Term. This License is effective on the Effective Date and continues only while the Customer has Authorized Access.</li>
+<li>Termination. This License terminates automatically when Authorized Access ends and may be terminated by GitHub for breach or as permitted by the Agreement.</li>
+<li>
 
-   3. **AI Services.** The Runtime invokes GitHub-hosted AI and related services. This License does not independently grant access to those services. Use of the services is governed by the Agreement and the applicable product, generative-AI, privacy, and data-protection terms.
+### Effect of Termination. On termination or expiration:
 
-   4. **Models and Findings.** Model availability is subject to GitHub support and Customer model policies. Security findings may be AI-generated. Product documentation describes relevant processing, retention, and controls.
+<ol type="a">
+<li>Customer must stop using the Runtime;</li>
+<li>all rights granted under this License end;</li>
+<li>Customer must delete copies of the Runtime under its control, subject to ordinary automated backup and cache-cleanup processes;</li>
+<li>GitHub may disable access to the AI service; and</li>
+<li>accrued payment obligations and Sections 3, 4, 5, 7, 8, 10.3, 11, and 12 survive.</li>
+</ol>
 
-3. **SEPARATELY LICENSED GITHUB PRODUCTS; CODEQL**
+</li>
+<li>Public Availability After Termination. The Runtime may remain technically downloadable from the public repository after termination. Continued public availability does not extend or revive any license.</li>
+</ol>
 
-   5. **Separately Licensed Products.** GitHub products, services, or components that are separately licensed remain subject to their own terms. This License does not grant rights to any such product, service, or component.
+</li>
 
-4. **OWNERSHIP**
+<li>
 
-   6. **Ownership.** GitHub and its licensors retain all right, title, and interest in and to the Runtime. The Runtime is licensed, not sold.
+### WARRANTIES, LIABILITY, AND AGREEMENT HIERARCHY
 
-   7. **No Implied Licenses.** No licenses are granted by implication, estoppel, or otherwise. GitHub reserves all rights not expressly granted. No source-code rights and no trademark or branding rights are granted.
+<ol>
+<li>Agreement Controls. Warranty disclaimers, liability limitations, indemnities, governing-law, dispute-resolution, export, and trade-compliance obligations are governed by the Agreement and incorporated by reference. Support and service levels are governed by the Agreement and applicable product documentation.</li>
+<li>AI Output Disclaimer. AI Scan findings may be inaccurate, incomplete, or fail to identify vulnerabilities. AI Scan supplements and does not replace Customer's own security testing, secure-development practices, and code review.</li>
+<li>Mandatory Law. Nothing in this License limits rights or remedies that cannot be limited under applicable mandatory law.</li>
+<li>Fallback Standalone Terms. If no Agreement supplies governing law, this License is governed by the laws of the State of California, excluding conflicts-of-law rules, with exclusive venue in the state and federal courts located in San Francisco County, California. [VERIFY]</li>
+</ol>
 
-   8. **Customer Content.** Customer retains its rights in its code and other content, subject to the Agreement.
+</li>
 
-5. **UPDATES AND TECHNICAL OPERATION**
+<li>
 
-   9. **Updates.** GitHub may issue automatic or required Runtime updates, and may replace, deprecate, or discontinue Runtime versions.
+### ACCEPTANCE AND INCORPORATION
 
-   10. **Integrity.** GitHub may use checksums, signatures, or other integrity controls. Customer must not circumvent them.
+<ol>
+<li>
 
-   11. **Caching and Cleanup.** GitHub Actions may temporarily cache the Runtime. GitHub may remove or invalidate obsolete versions. Direct local use of the Runtime is not supported.
+Acceptance. This License is accepted by the earliest of:
 
-   12. **No Compatibility Promise.** GitHub does not promise backward compatibility, a fixed model, continued availability of any version, or any specific feature except as required by the Agreement.
+<ol type="a">
+<li>the Customer's execution or acceptance of an Agreement that incorporates this License by reference;</li>
+<li>the Customer's acceptance of a preview invitation that incorporates this License; or</li>
+<li>the Customer's download, installation, or execution of the Runtime.</li>
+</ol>
 
-6. **TERM AND TERMINATION**
+</li>
+</ol>
 
-   13. **Term.** This License is effective on the Effective Date and continues only while the Customer has Authorized Access.
+</li>
 
-   14. **Termination.** This License terminates automatically when Authorized Access ends and may be terminated by GitHub for breach or as permitted by the Agreement.
+<li>
 
-   15. **Effect of Termination.** On termination or expiration:
+### GENERAL
 
-(a) Customer must stop using the Runtime;
+<ol>
+<li>Notices. Notices are given as provided in the Agreement.</li>
+<li>Assignment. Customer must not assign License except as permitted by the Agreement. GitHub may assign to an affiliate or successor.</li>
+<li>Entire Agreement; Amendments. Together with the Agreement and referenced documents, this License is the entire agreement regarding the Runtime. Amendments are governed by the Agreement.</li>
+<li>Severability. If a provision is unenforceable, the remainder remains in effect.</li>
+<li>Counterparts; Electronic Signatures. This License may be accepted electronically and in counterparts.</li>
+</ol>
 
-(b) all rights granted under this License end;
+</li>
 
-(c) Customer must delete copies of the Runtime under its control, subject to ordinary automated backup and cache-cleanup processes;
-
-(d) GitHub may disable access to the AI service; and
-
-(e) accrued payment obligations and Sections 3, 4, 5, 7, 8, 10.3, 11, and 12 survive.
-
-  1. **Public Availability After Termination.** The Runtime may remain technically downloadable from the public repository after termination. Continued public availability does not extend or revive any license.
-
-1. **WARRANTIES, LIABILITY, AND AGREEMENT HIERARCHY**
-
-   1. **Agreement Controls.** Warranty disclaimers, liability limitations, indemnities, governing-law, dispute-resolution, export, and trade-compliance obligations are governed by the Agreement and incorporated by reference. Support and service levels are governed by the Agreement and applicable product documentation.
-
-   2. **AI Output Disclaimer.** AI Scan findings may be inaccurate, incomplete, or fail to identify vulnerabilities. AI Scan supplements and does not replace Customer's own security testing, secure-development practices, and code review.
-
-   3. **Mandatory Law.** Nothing in this License limits rights or remedies that cannot be limited under applicable mandatory law. 
-
-   4. **Fallback Standalone Terms.** If no Agreement supplies governing law, this License is governed by the laws of the State of California, excluding conflicts-of-law rules, with exclusive venue in the state and federal courts located in San Francisco County, California. [VERIFY]
-
-2. **ACCEPTANCE AND INCORPORATION**
-
-   5. **Acceptance.** This License is accepted by the earliest of: (a) the Customer's execution or acceptance of an Agreement that incorporates this License by reference; (b) the Customer's acceptance of a preview invitation that incorporates this License; or (c) the Customer's download, installation, or execution of the Runtime.
-
-3. **GENERAL**
-
-   6. **Notices.** Notices are given as provided in the Agreement.
-
-   7. **Assignment.** Customer must not assign License except as permitted by the Agreement. GitHub may assign to an affiliate or successor.
-
-   8. **Entire Agreement; Amendments.** Together with the Agreement and referenced documents, this License is the entire agreement regarding the Runtime. Amendments are governed by the Agreement.
-
-   9. **Severability.** If a provision is unenforceable, the remainder remains in effect.
-
-   10. **Counterparts; Electronic Signatures.** This License may be accepted electronically and in counterparts.
+</ol>
