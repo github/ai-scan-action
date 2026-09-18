@@ -1,0 +1,118 @@
+# Consumer-facing action, published from this directory to a standalone action repository.
+name: AI Scan
+description: Run AI Scan on the current repository to detect and report security vulnerabilities.
+
+inputs:
+  token:
+    description: GitHub token used for Copilot requests and code scanning access.
+    required: false
+    default: ${{ github.token }}
+  copilot-token:
+    description: GitHub token used for Copilot requests only. Overrides token.
+    required: false
+    default: ''
+  copilot-integration-id:
+    description: GitHub Copilot integration ID used for Copilot requests.
+    required: false
+    default: ''
+  tools:
+    description: >
+      Path to a locally built AI Scan tools archive, or a release tag on the
+      action's own repository (defaults to `latest`) to download that asset
+      from. Any value that resolves to an existing file is used as-is;
+      everything else is treated as a tag.
+    required: false
+    default: latest
+  source-root:
+    description: Path of the root source code directory, relative to $GITHUB_WORKSPACE.
+    required: false
+    default: .
+  baseline-ref:
+    description: Git ref of the baseline to compare against.
+    required: false
+    default: ${{ github.ref }}
+
+runs:
+  using: composite
+  steps:
+    - id: resolve
+      shell: bash
+      env:
+        TOOLS: ${{ inputs.tools }}
+        RELEASE_REPO: ${{ github.action_repository }}
+        GH_TOKEN: ${{ inputs.token }}
+      run: |
+        if [[ -f "${TOOLS}" ]]; then
+          echo "tools: using local tarball ${TOOLS}"
+          tarball="${TOOLS}"
+        else
+          if [[ "${TOOLS}" == "latest" ]]; then
+            tag="$(gh release view --repo "${RELEASE_REPO}" --json tagName --jq .tagName)"
+          else
+            tag="${TOOLS}"
+          fi
+          echo "tools: ${TOOLS} is not a file; downloading tag ${tag} from ${RELEASE_REPO}"
+          out="${RUNNER_TEMP}/ai-scan.tar.xz"
+          gh release download "${tag}" \
+            --repo "${RELEASE_REPO}" \
+            --pattern ai-scan.tar.xz \
+            --output "${out}"
+          tarball="${out}"
+        fi
+
+        if ! bun_version="$(tar -xJOf "${tarball}" ./ai-scan-bun-version)"; then
+          echo "::error::AI Scan archive ${tarball} does not contain a readable ai-scan-bun-version stamp"
+          exit 1
+        fi
+        if [[ ! "${bun_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "::error::AI Scan archive ${tarball} contains an invalid Bun version: ${bun_version}"
+          exit 1
+        fi
+
+        {
+          echo "tarball=${tarball}"
+          echo "bun-version=${bun_version}"
+        } >>"${GITHUB_OUTPUT}"
+
+    - name: Set up Node.js for Copilot CLI
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version: 22
+
+    # AI Scan ships as a JavaScript bundle rather than a self-contained
+    # executable, so the runtime it needs is downloaded here from Bun's own
+    # upstream instead of being redistributed inside our release asset.
+    #
+    # The archive records the Bun version that built the bundle. Resolve that
+    # version before setup so independently released tools assets remain
+    # compatible with action versions already in use.
+    - name: Set up Bun for AI Scan
+      uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+      with:
+        bun-version: ${{ steps.resolve.outputs.bun-version }}
+
+    - name: Run AI Scan
+      shell: bash
+      env:
+        # The runner exports the repository, ref, SHA, and workspace.
+        # The action forwards credentials plus its source-root and
+        # baseline-ref inputs; run.sh maps the Copilot-specific values
+        # to the environment expected by AI Scan and the Copilot SDK.
+        GITHUB_TOKEN: ${{ inputs.token }}
+        ARGUS_COPILOT_TOKEN: ${{ inputs.copilot-token }}
+        ARGUS_COPILOT_INTEGRATION_ID: ${{ inputs.copilot-integration-id }}
+        ARGUS_TARBALL: ${{ steps.resolve.outputs.tarball }}
+        ARGUS_SOURCE_ROOT: ${{ inputs.source-root }}
+        ARGUS_BASELINE_REF: ${{ inputs.baseline-ref }}
+      # `GITHUB_ACTION_PATH` and `RUNNER_TEMP` are exported by the
+      # runner, so they need no forwarding; only `ARGUS_TARBALL` — a
+      # step output rather than an ambient value — does.
+      run: bash "${GITHUB_ACTION_PATH}/run.sh" "${RUNNER_TEMP}" "${ARGUS_TARBALL}"
+
+    - name: Upload raw AI Scan findings
+      if: always() && runner.debug == '1'
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: argus-core-raw-output
+        path: ${{ runner.temp }}/argus-output
+        if-no-files-found: warn
