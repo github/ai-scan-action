@@ -1,0 +1,32 @@
+# Checks out the calling repository and runs AI Scan on it to detect and report
+# security vulnerabilities.
+name: AI Scan
+
+on:
+  workflow_call:
+    secrets:
+      copilot-token:
+        description: GitHub token used for Copilot requests.
+        required: true
+      copilot-integration-id:
+        description: GitHub Copilot integration ID used for Copilot requests.
+        required: true
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  ai-scan:
+    name: Run AI Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Run AI Scan
+        # Runs the AI Scan action from the same version as this workflow.
+        uses: $/
+        with:
+          copilot-token: ${{ secrets.copilot-token }}
+          copilot-integration-id: ${{ secrets.copilot-integration-id }}
