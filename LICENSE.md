@@ -127,8 +127,8 @@ No Open Source; No Implied Grant. Public availability of the Runtime:
 ### THIRD-PARTY SOFTWARE
 
 <ol>
-<li>Third-Party Components. The Runtime may include third-party software and materials governed by separate license terms. Applicable license texts, copyright notices, attribution notices, and other required notices are identified in the `THIRD-PARTY-LICENSES.md` file distributed with the Runtime.</li>
-<li>Separate Terms. To the extent required by an applicable third-party license, that license governs the applicable third-party component. Nothing in this License limits rights granted directly under an applicable open-source or third-party license. </li>
+<li>Third-Party Components. The Runtime may include third-party or open-source components governed by their own license terms. Applicable notices are provided with the Runtime.</li>
+<li>Precedence for Third-Party Components. This License does not restrict rights granted to Customer directly under an applicable open-source or third-party license. If a third-party license conflicts with this License for a specific component, the third-party license controls for that component.</li>
 </ol>
 
 </li>
