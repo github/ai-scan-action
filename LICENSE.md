@@ -1,6 +1,6 @@
 # **GitHub AI Scan License**
 
-This GitHub AI Scan License (the **"License"**) governs the limited right to download and execute the AI Scan as part of GitHub's AI Scan feature. It is entered into between GitHub ("GitHub") and the customer receiving Authorized Access ("Customer"). The License is effective as of the earliest of the Customer's acceptance of the applicable Agreement, receipt of a preview invitation, or first use of the Runtime (the "Effective Date").
+This GitHub AI Scan License (the **"License"**) governs the limited right to download and execute the AI Scan as part of GitHub's AI Scan feature. It is between GitHub ("GitHub") and the customer receiving Authorized Access ("Customer"). The License is effective as of the earliest of the Customer's acceptance of the applicable Agreement, receipt of a Preview invitation, or first use of the Runtime (the "Effective Date").
 
 <ol>
 
@@ -16,7 +16,7 @@ Definitions. In this License:
 <ol type="a">
 <li>"Agreement" means the applicable written agreement between GitHub and the Customer governing the Customer's use of GitHub products and services, including any Additional Product Terms, Generative AI Services Terms, Data Protection Agreement, and applicable order form.</li>
 <li>"AI Scan" means GitHub's managed AI-powered security-scanning feature, however branded.</li>
-<li>"AI Scan Runtime" or "Runtime" means the compiled executable binary, command-line interface, GitHub Action wrapper, and related executable or supporting files distributed by GitHub to enable execution of AI Scan.</li>
+<li>"AI Scan Runtime" or "Runtime" means the software artifacts, command-line interface, GitHub Action wrapper, and related supporting files distributed by GitHub to enable execution of AI Scan.</li>
 <li>"Authorized Access" means access granted to the Customer through (i) a written AI Scan preview invitation, (ii) an active AI Scan subscription or entitlement, (iii) an order form, or (iv) a GHAS or Code Security entitlement that includes AI Scan.</li>
 <li>"Authorized Codebase" means a repository or codebase that the Customer owns, controls, develops, maintains, or is otherwise authorized to test.</li>
 <li>"Approved Invocation" means initiation of AI Scan through a GitHub-provided user interface, API, or other mechanism expressly approved by GitHub in documentation.</li>
@@ -63,7 +63,7 @@ License Conditions. The license is conditioned on and continues only while the C
 </ol>
 
 </li>
-<li>No Source or Internal Materials. No rights are granted to source code, system prompts, scanning logic, build instructions, tests, evaluation materials, model weights, query logic, or other internal materials of GitHub.</li>
+<li>No Source or Internal Materials. Except for rights independently granted under an applicable third-party license, no rights are granted under this License to GitHub’s proprietary source code, system prompts, scanning logic, build instructions, tests, evaluation materials, model weights, query logic, or other internal materials.</li>
 </ol>
 
 </li>
@@ -109,9 +109,9 @@ Restrictions. Except to the extent required by mandatory law or by an applicable
 No Open Source; No Implied Grant. Public availability of the Runtime:
 
 <ol type="a">
-<li>does not make the Runtime open-source software;</li>
+<li>does not make GitHub’s proprietary portions of the Runtime open-source software;</li>
 <li>does not grant any person access to AI Scan or GitHub's AI services;</li>
-<li>does not grant any license to any person who does not have Authorized Access;</li>
+<li>does not grant any license under GitHub’s proprietary rights to any person who does not have Authorized Access;</li>
 <li>does not create any entitlement based on mere possession of a copy; and</li>
 <li>does not limit GitHub's right to authenticate, authorize, meter, throttle, disable, or reject use of the Runtime or the AI service.</li>
 </ol>
@@ -127,8 +127,8 @@ No Open Source; No Implied Grant. Public availability of the Runtime:
 ### THIRD-PARTY SOFTWARE
 
 <ol>
-<li>Third-Party Components. The Runtime may include third-party or open-source components governed by their own license terms. Applicable notices are provided with the Runtime.</li>
-<li>Precedence for Third-Party Components. This License does not restrict rights granted to Customer directly under an applicable open-source or third-party license. If a third-party license conflicts with this License for a specific component, the third-party license controls for that component.</li>
+<li>Third-Party Components. The Runtime may include third-party software and materials governed by separate license terms. Applicable license texts, copyright notices, attribution notices, and other required notices are identified in the `THIRD-PARTY-LICENSES.md` file distributed with the Runtime.</li>
+<li>Separate Terms. To the extent required by an applicable third-party license, that license governs the applicable third-party component. Nothing in this License limits rights granted directly under an applicable open-source or third-party license.</li>
 </ol>
 
 </li>
@@ -192,7 +192,7 @@ No Open Source; No Implied Grant. Public availability of the Runtime:
 
 <ol type="a">
 <li>Customer must stop using the Runtime;</li>
-<li>all rights granted under this License end;</li>
+<li>all rights granted under this License end, without affecting rights independently granted under an applicable third-party license;</li>
 <li>Customer must delete copies of the Runtime under its control, subject to ordinary automated backup and cache-cleanup processes;</li>
 <li>GitHub may disable access to the AI service; and</li>
 <li>accrued payment obligations and Sections 3, 4, 5, 7, 8, 10.3, 11, and 12 survive.</li>
