@@ -26,7 +26,7 @@ jobs:
 
       - name: Run AI Scan
         # Runs the AI Scan action from the same version as this workflow.
-        uses: github/ai-scan-action@a754431ead526b9062ffb754ab07ec3d90f230b5
+        uses: github/ai-scan-action@ed6af26da3ea2aec320c092c21cf4200a5849b6e
         with:
           copilot-token: ${{ secrets.copilot-token }}
           copilot-integration-id: ${{ secrets.copilot-integration-id }}
