@@ -46,18 +46,40 @@ runs:
           echo "tools: using local tarball ${TOOLS}"
           tarball="${TOOLS}"
         else
-          if [[ "${TOOLS}" == "latest" ]]; then
-            tag="$(gh release view --repo "${RELEASE_REPO}" --json tagName --jq .tagName)"
-          else
-            tag="${TOOLS}"
+          echo "tools: ${TOOLS} is not a file"
+          tarball_basename=ai-scan.tar.xz
+          tarball="${RUNNER_TEMP}/${tarball_basename}"
+          authenticated_download=false
+
+          # Releases of github/ai-scan-action are downloaded anonymously, so no
+          # token is sent. Any other action repository downloads its releases
+          # with authentication, using the action's token.
+          if [[ "${RELEASE_REPO}" != "github/ai-scan-action" ]]; then
+            authenticated_download=true
           fi
-          echo "tools: ${TOOLS} is not a file; downloading tag ${tag} from ${RELEASE_REPO}"
-          out="${RUNNER_TEMP}/ai-scan.tar.xz"
-          gh release download "${tag}" \
-            --repo "${RELEASE_REPO}" \
-            --pattern ai-scan.tar.xz \
-            --output "${out}"
-          tarball="${out}"
+
+          if [[ "${authenticated_download}" == "true" ]]; then
+            echo "tools: downloading the release from ${RELEASE_REPO} with authentication using gh"
+            if [[ "${TOOLS}" == "latest" ]]; then
+              GH_HOST=github.com gh release download \
+                --repo "${RELEASE_REPO}" \
+                --pattern "${tarball_basename}" \
+                --output "${tarball}"
+            else
+              GH_HOST=github.com gh release download "${TOOLS}" \
+                --repo "${RELEASE_REPO}" \
+                --pattern "${tarball_basename}" \
+                --output "${tarball}"
+            fi
+          else
+            echo "tools: downloading the release from ${RELEASE_REPO} using curl"
+            if [[ "${TOOLS}" == "latest" ]]; then
+              url="https://github.com/${RELEASE_REPO}/releases/latest/download/${tarball_basename}"
+            else
+              url="https://github.com/${RELEASE_REPO}/releases/download/${TOOLS}/${tarball_basename}"
+            fi
+            curl --fail --silent --show-error --location --retry 3 --output "${tarball}" "${url}"
+          fi
         fi
 
         if ! bun_version="$(tar -xJOf "${tarball}" ./ai-scan-bun-version)"; then
