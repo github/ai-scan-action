@@ -212,7 +212,7 @@ No Open Source; No Implied Grant. Public availability of the Runtime:
 <li>Agreement Controls. Warranty disclaimers, liability limitations, indemnities, governing-law, dispute-resolution, export, and trade-compliance obligations are governed by the Agreement and incorporated by reference. Support and service levels are governed by the Agreement and applicable product documentation.</li>
 <li>AI Output Disclaimer. AI Scan findings may be inaccurate, incomplete, or fail to identify vulnerabilities. AI Scan supplements and does not replace Customer's own security testing, secure-development practices, and code review.</li>
 <li>Mandatory Law. Nothing in this License limits rights or remedies that cannot be limited under applicable mandatory law.</li>
-<li>Fallback Standalone Terms. If no Agreement supplies governing law, this License is governed by the laws of the State of California, excluding conflicts-of-law rules, with exclusive venue in the state and federal courts located in San Francisco County, California. [VERIFY]</li>
+<li>Fallback Standalone Terms. If no Agreement supplies governing law, this License is governed by the laws of the State of California, excluding conflicts-of-law rules, with exclusive venue in the state and federal courts located in San Francisco County, California.</li>
 </ol>
 
 </li>
