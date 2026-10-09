@@ -42,6 +42,13 @@ runs:
         RELEASE_REPO: ${{ github.action_repository }}
         GH_TOKEN: ${{ inputs.token }}
       run: |
+        # The first thing the action does, reported in telemetry as the
+        # action's start time.
+        action_started_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+        # Release tag of the tools archive, reported in telemetry. It stays
+        # empty for a local archive, which telemetry treats as not known.
+        implementation_version=
         if [[ -f "${TOOLS}" ]]; then
           echo "tools: using local tarball ${TOOLS}"
           tarball="${TOOLS}"
@@ -58,27 +65,40 @@ runs:
             authenticated_download=true
           fi
 
+          # `latest` moves, so resolve it to the release tag first. That tag is
+          # what is downloaded and what telemetry reports as the version run.
+          tag="${TOOLS}"
+          if [[ "${tag}" == "latest" ]]; then
+            if [[ "${authenticated_download}" == "true" ]]; then
+              tag="$(GH_HOST=github.com gh release view \
+                --repo "${RELEASE_REPO}" --json tagName --jq .tagName)"
+            else
+              # `releases/latest` redirects to `releases/tag/<tag>`. Following that
+              # redirect is not subject to the per-IP rate limit that the
+              # unauthenticated api.github.com has on shared runners.
+              latest_url="$(curl --fail --silent --show-error --retry 3 \
+                --output /dev/null --write-out '%{redirect_url}' \
+                "https://github.com/${RELEASE_REPO}/releases/latest")"
+              tag="${latest_url##*/}"
+            fi
+            if [[ -z "${tag}" ]]; then
+              echo "::error::Could not resolve the latest AI Scan release of ${RELEASE_REPO}"
+              exit 1
+            fi
+            echo "tools: latest is ${tag}"
+          fi
+          implementation_version="${tag}"
+
           if [[ "${authenticated_download}" == "true" ]]; then
             echo "tools: downloading the release from ${RELEASE_REPO} with authentication using gh"
-            if [[ "${TOOLS}" == "latest" ]]; then
-              GH_HOST=github.com gh release download \
-                --repo "${RELEASE_REPO}" \
-                --pattern "${tarball_basename}" \
-                --output "${tarball}"
-            else
-              GH_HOST=github.com gh release download "${TOOLS}" \
-                --repo "${RELEASE_REPO}" \
-                --pattern "${tarball_basename}" \
-                --output "${tarball}"
-            fi
+            GH_HOST=github.com gh release download "${tag}" \
+              --repo "${RELEASE_REPO}" \
+              --pattern "${tarball_basename}" \
+              --output "${tarball}"
           else
             echo "tools: downloading the release from ${RELEASE_REPO} using curl"
-            if [[ "${TOOLS}" == "latest" ]]; then
-              url="https://github.com/${RELEASE_REPO}/releases/latest/download/${tarball_basename}"
-            else
-              url="https://github.com/${RELEASE_REPO}/releases/download/${TOOLS}/${tarball_basename}"
-            fi
-            curl --fail --silent --show-error --location --retry 3 --output "${tarball}" "${url}"
+            curl --fail --silent --show-error --location --retry 3 --output "${tarball}" \
+              "https://github.com/${RELEASE_REPO}/releases/download/${tag}/${tarball_basename}"
           fi
         fi
 
@@ -94,6 +114,8 @@ runs:
         {
           echo "tarball=${tarball}"
           echo "bun-version=${bun_version}"
+          echo "implementation-version=${implementation_version}"
+          echo "action-started-at=${action_started_at}"
         } >>"${GITHUB_OUTPUT}"
 
     - name: Set up Node.js for Copilot CLI
@@ -113,6 +135,17 @@ runs:
       with:
         bun-version: ${{ steps.resolve.outputs.bun-version }}
 
+    # Unpacking is its own step so its result (`package-dir`) is a step
+    # output every later step can read.
+    - name: Unpack AI Scan
+      id: unpack
+      shell: bash
+      env:
+        ARGUS_TARBALL: ${{ steps.resolve.outputs.tarball }}
+      run: |
+        package_dir="$(bash "${GITHUB_ACTION_PATH}/unpack.sh" "${RUNNER_TEMP}" "${ARGUS_TARBALL}")"
+        echo "package-dir=${package_dir}" >>"${GITHUB_OUTPUT}"
+
     - name: Run AI Scan
       shell: bash
       env:
@@ -123,13 +156,16 @@ runs:
         GITHUB_TOKEN: ${{ inputs.token }}
         ARGUS_COPILOT_TOKEN: ${{ inputs.copilot-token }}
         ARGUS_COPILOT_INTEGRATION_ID: ${{ inputs.copilot-integration-id }}
-        ARGUS_TARBALL: ${{ steps.resolve.outputs.tarball }}
+        ARGUS_PACKAGE_DIR: ${{ steps.unpack.outputs.package-dir }}
+        ARGUS_ACTION_VERSION: ${{ github.action_ref }}
+        ARGUS_IMPLEMENTATION_VERSION: ${{ steps.resolve.outputs.implementation-version }}
+        ARGUS_ACTION_STARTED_AT: ${{ steps.resolve.outputs.action-started-at }}
         ARGUS_SOURCE_ROOT: ${{ inputs.source-root }}
         ARGUS_BASELINE_REF: ${{ inputs.baseline-ref }}
       # `GITHUB_ACTION_PATH` and `RUNNER_TEMP` are exported by the
-      # runner, so they need no forwarding; only `ARGUS_TARBALL` — a
-      # step output rather than an ambient value — does.
-      run: bash "${GITHUB_ACTION_PATH}/run.sh" "${RUNNER_TEMP}" "${ARGUS_TARBALL}"
+      # runner, so they need no forwarding; only `ARGUS_PACKAGE_DIR` —
+      # a step output rather than an ambient value — does.
+      run: bash "${GITHUB_ACTION_PATH}/run.sh" "${RUNNER_TEMP}" "${ARGUS_PACKAGE_DIR}"
 
     - name: Upload raw AI Scan findings
       if: always() && runner.debug == '1'
