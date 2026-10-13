@@ -19,8 +19,10 @@ inputs:
     description: >
       Path to a locally built AI Scan tools archive, or a release tag on the
       action's own repository (defaults to `latest`) to download that asset
-      from. Any value that resolves to an existing file is used as-is;
-      everything else is treated as a tag.
+      from. For unset or `latest`, the `argus_action_use_upcoming_release` feature
+      flag can select the `upcoming` release; failures fall back to `latest`.
+      Any value that resolves to an existing file is used as-is; everything
+      else is treated as a tag.
     required: false
     default: latest
   source-root:
@@ -65,50 +67,103 @@ runs:
             authenticated_download=true
           fi
 
-          # `latest` moves, so resolve it to the release tag first. That tag is
-          # what is downloaded and what telemetry reports as the version run.
-          tag="${TOOLS}"
-          if [[ "${tag}" == "latest" ]]; then
+          resolve_latest_tag() {
             if [[ "${authenticated_download}" == "true" ]]; then
-              tag="$(GH_HOST=github.com gh release view \
-                --repo "${RELEASE_REPO}" --json tagName --jq .tagName)"
+              GH_HOST=github.com gh release view \
+                --repo "${RELEASE_REPO}" --json tagName --jq .tagName
             else
               # `releases/latest` redirects to `releases/tag/<tag>`. Following that
               # redirect is not subject to the per-IP rate limit that the
               # unauthenticated api.github.com has on shared runners.
+              local latest_url
               latest_url="$(curl --fail --silent --show-error --retry 3 \
                 --output /dev/null --write-out '%{redirect_url}' \
                 "https://github.com/${RELEASE_REPO}/releases/latest")"
-              tag="${latest_url##*/}"
+              printf '%s' "${latest_url##*/}"
+            fi
+          }
+
+          download_release() {
+            local release_tag="$1"
+            rm -f "${tarball}"
+            if [[ "${authenticated_download}" == "true" ]]; then
+              echo "tools: downloading the release from ${RELEASE_REPO} with authentication using gh"
+              GH_HOST=github.com gh release download "${release_tag}" \
+                --repo "${RELEASE_REPO}" \
+                --pattern "${tarball_basename}" \
+                --output "${tarball}" || return 1
+            else
+              echo "tools: downloading the release from ${RELEASE_REPO} using curl"
+              curl --fail --silent --show-error --location --retry 3 --output "${tarball}" \
+                "https://github.com/${RELEASE_REPO}/releases/download/${release_tag}/${tarball_basename}" || return 1
+            fi
+
+            local archive_bun_version
+            if ! archive_bun_version="$(tar -xJOf "${tarball}" ./ai-scan-bun-version)"; then
+              echo "tools: release ${release_tag} has no readable ai-scan-bun-version stamp" >&2
+              return 1
+            fi
+            if [[ ! "${archive_bun_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "tools: release ${release_tag} has an invalid Bun version: ${archive_bun_version}" >&2
+              return 1
+            fi
+            bun_version="${archive_bun_version}"
+          }
+
+          # `latest` moves, so resolve it to the release tag first. That tag is
+          # what is downloaded and what telemetry reports as the version run.
+          tag="${TOOLS}"
+          if [[ -z "${tag}" || "${tag}" == "latest" ]]; then
+            use_upcoming=false
+            if upcoming_flag="$(GH_HOST=github.com gh api --method GET \
+              "repos/${GITHUB_REPOSITORY}/code-scanning/ai-scan-action/features" \
+              -f features=use_upcoming_release --jq '.use_upcoming_release' 2>/dev/null)" &&
+              [[ "${upcoming_flag}" == "true" ]]; then
+              use_upcoming=true
+            else
+              echo "::warning::Could not enable the upcoming AI Scan release; using latest"
+            fi
+
+            if [[ "${use_upcoming}" == "true" ]]; then
+              tag=upcoming
+              if ! download_release "${tag}"; then
+                echo "::warning::Could not use the upcoming AI Scan release; falling back to latest"
+                tag=
+              fi
+            fi
+
+            if [[ -z "${tag}" || "${tag}" == "latest" ]]; then
+              tag="$(resolve_latest_tag)"
             fi
             if [[ -z "${tag}" ]]; then
               echo "::error::Could not resolve the latest AI Scan release of ${RELEASE_REPO}"
               exit 1
             fi
-            echo "tools: latest is ${tag}"
+            echo "tools: selected release ${tag}"
+            if [[ "${tag}" != "upcoming" ]]; then
+              if ! download_release "${tag}"; then
+                echo "::error::Could not download or validate AI Scan release ${tag} from ${RELEASE_REPO}"
+                exit 1
+              fi
+            fi
+          else
+            if ! download_release "${tag}"; then
+              echo "::error::Could not download or validate AI Scan release ${tag} from ${RELEASE_REPO}"
+              exit 1
+            fi
           fi
           implementation_version="${tag}"
+        fi
 
-          if [[ "${authenticated_download}" == "true" ]]; then
-            echo "tools: downloading the release from ${RELEASE_REPO} with authentication using gh"
-            GH_HOST=github.com gh release download "${tag}" \
-              --repo "${RELEASE_REPO}" \
-              --pattern "${tarball_basename}" \
-              --output "${tarball}"
-          else
-            echo "tools: downloading the release from ${RELEASE_REPO} using curl"
-            curl --fail --silent --show-error --location --retry 3 --output "${tarball}" \
-              "https://github.com/${RELEASE_REPO}/releases/download/${tag}/${tarball_basename}"
+        if [[ -f "${TOOLS}" ]]; then
+          if ! bun_version="$(tar -xJOf "${tarball}" ./ai-scan-bun-version)"; then
+            echo "::error::AI Scan archive ${tarball} does not contain a readable ai-scan-bun-version stamp"
+            exit 1
           fi
-        fi
-
-        if ! bun_version="$(tar -xJOf "${tarball}" ./ai-scan-bun-version)"; then
-          echo "::error::AI Scan archive ${tarball} does not contain a readable ai-scan-bun-version stamp"
-          exit 1
-        fi
-        if [[ ! "${bun_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          echo "::error::AI Scan archive ${tarball} contains an invalid Bun version: ${bun_version}"
-          exit 1
+          if [[ ! "${bun_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::AI Scan archive ${tarball} contains an invalid Bun version: ${bun_version}"
+            exit 1
+          fi
         fi
 
         {
