@@ -2,12 +2,14 @@
 #
 # AI Scan core runner. Resolves the Copilot CLI and invokes AI Scan
 # core from an already-unpacked package directory (see `unpack.sh`,
-# which does the tarball extraction and Bun-version check). This
+# which does the tarball extraction). This
 # runner does not inspect the CLI's inputs — the CLI reads everything
 # it needs from the environment.
 #
-# The bundle (`argus.js`) is a JavaScript file, not an executable, so
-# the Bun runtime that `unpack.sh` verified must be on PATH.
+# Node bundles (`argus.mjs`) run on Node.js 22, provisioned by `action.yml`.
+# Bundles built before the switch to Node.js (`argus.js`) run on the Bun
+# version that `action.yml` sets up from the archive's stamp. The Copilot
+# CLI always runs on Node.js.
 #
 # The bundle reports the `@github/copilot` version required by AI Scan.
 # This runner installs that exact version in an isolated directory.
@@ -16,6 +18,8 @@
 #   run.sh <work-dir> <package-dir>
 #
 # Environment:
+#   ARGUS_RUNTIME        Runtime for the bundle: `node` (default) runs
+#                        `argus.mjs`, `bun` runs `argus.js`.
 #   GITHUB_TOKEN         Forwarded to AI Scan for the Octokit client
 #                        and used as the default Copilot credential.
 #   ARGUS_COPILOT_TOKEN  Optional Copilot-only credential.
@@ -31,13 +35,20 @@
 #                        `.` (scan the whole checkout).
 #   ARGUS_BASELINE_REF   Baseline git ref reverify compares against.
 #                        The action defaults it to the ref being
-#                        built (`github.ref`).
+#                        built (`github.ref`); ignored for PR scans.
+#   GITHUB_EVENT_NAME,  PR scans compare the event's base and PR-head
+#   GITHUB_EVENT_PATH   SHAs through GitHub's REST API.
 # Optional run provenance, forwarded verbatim and reported in telemetry:
 #   ARGUS_ACTION_VERSION Ref the action was invoked at (`github.action_ref`).
 #   ARGUS_IMPLEMENTATION_VERSION
 #                        Release tag of the AI Scan archive being run.
 #   ARGUS_ACTION_STARTED_AT
 #                        RFC 3339 timestamp of when the action started.
+#   ARGUS_TELEMETRY_OUTBOX
+#                        Directory in which the run keeps its telemetry
+#                        outbox, so `finalize-telemetry` can send the
+#                        final report if this run dies first. The action
+#                        puts it in the runner's temp directory.
 #
 set -euo pipefail
 
@@ -52,9 +63,18 @@ package_dir="$2"
 copilot_dir="${work_dir}/argus-copilot"
 github_copilot_token="${ARGUS_COPILOT_TOKEN:-${GITHUB_TOKEN}}"
 github_copilot_integration_id="${ARGUS_COPILOT_INTEGRATION_ID:-}"
-argus_bundle="${package_dir}/argus.js"
+argus_runtime="${ARGUS_RUNTIME:-node}"
+case "${argus_runtime}" in
+  node) argus_bundle="${package_dir}/argus.mjs" ;;
+  # TODO(bun-compat): Remove the Bun branch after production bundles use Node.
+  bun) argus_bundle="${package_dir}/argus.js" ;;
+  *)
+    echo "run.sh: unsupported AI Scan runtime: ${argus_runtime}" >&2
+    exit 2
+    ;;
+esac
 
-copilot_version="$(env -C "${package_dir}" bun "${argus_bundle}" copilot-cli-version)"
+copilot_version="$(env -C "${package_dir}" "${argus_runtime}" "${argus_bundle}" copilot-cli-version)"
 if [[ ! "${copilot_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-+][0-9A-Za-z.-]+)?$ ]]; then
   echo "run.sh: invalid required Copilot CLI version reported by Argus: ${copilot_version}" >&2
   exit 1
@@ -70,4 +90,4 @@ if [ -n "${github_copilot_integration_id}" ]; then
   argus_env+=(GITHUB_COPILOT_INTEGRATION_ID="${github_copilot_integration_id}")
 fi
 
-env -C "${package_dir}" "${argus_env[@]}" bun "${argus_bundle}" actions-security-generic
+env -C "${package_dir}" "${argus_env[@]}" "${argus_runtime}" "${argus_bundle}" actions-security-generic

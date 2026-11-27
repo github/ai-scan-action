@@ -19,8 +19,15 @@ inputs:
     description: >
       Path to a locally built AI Scan tools archive, or a release tag on the
       action's own repository (defaults to `latest`) to download that asset
-      from. Any value that resolves to an existing file is used as-is;
-      everything else is treated as a tag.
+      from. The action runs Node bundles (`argus.mjs`) and older Bun bundles
+      (`argus.js` with an `ai-scan-bun-version` stamp). For unset or
+      `latest`, the `use_next_release` feature flag can
+      select the latest non-draft release if it is a prerelease; lookup,
+      download, or validation failures fall back to `latest`. Only values
+      starting with `/`, `./`, or `../` are checked for an existing file and
+      used as-is; use `./archive.tar.xz` or `./dist/archive.tar.xz` for an
+      archive relative to the current directory. Everything else is treated
+      as a tag.
     required: false
     default: latest
   source-root:
@@ -28,109 +35,41 @@ inputs:
     required: false
     default: .
   baseline-ref:
-    description: Git ref of the baseline to compare against.
+    description: Git ref of the baseline to compare against. Ignored for pull_request events.
     required: false
     default: ${{ github.ref }}
 
 runs:
   using: composite
   steps:
+    # Capture the action's start before setting up the resolver's runtime.
+    - id: started
+      shell: bash
+      run: echo "action-started-at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >>"${GITHUB_OUTPUT}"
+
+    - name: Set up Node.js
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version: 22
+
     - id: resolve
       shell: bash
       env:
         TOOLS: ${{ inputs.tools }}
         RELEASE_REPO: ${{ github.action_repository }}
         GH_TOKEN: ${{ inputs.token }}
-      run: |
-        # The first thing the action does, reported in telemetry as the
-        # action's start time.
-        action_started_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        GITHUB_API_URL: ${{ github.api_url }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        ACTION_STARTED_AT: ${{ steps.started.outputs.action-started-at }}
+      run: node "${GITHUB_ACTION_PATH}/resolve-tools.mjs"
 
-        # Release tag of the tools archive, reported in telemetry. It stays
-        # empty for a local archive, which telemetry treats as not known.
-        implementation_version=
-        if [[ -f "${TOOLS}" ]]; then
-          echo "tools: using local tarball ${TOOLS}"
-          tarball="${TOOLS}"
-        else
-          echo "tools: ${TOOLS} is not a file"
-          tarball_basename=ai-scan.tar.xz
-          tarball="${RUNNER_TEMP}/${tarball_basename}"
-          authenticated_download=false
-
-          # Releases of github/ai-scan-action are downloaded anonymously, so no
-          # token is sent. Any other action repository downloads its releases
-          # with authentication, using the action's token.
-          if [[ "${RELEASE_REPO}" != "github/ai-scan-action" ]]; then
-            authenticated_download=true
-          fi
-
-          # `latest` moves, so resolve it to the release tag first. That tag is
-          # what is downloaded and what telemetry reports as the version run.
-          tag="${TOOLS}"
-          if [[ "${tag}" == "latest" ]]; then
-            if [[ "${authenticated_download}" == "true" ]]; then
-              tag="$(GH_HOST=github.com gh release view \
-                --repo "${RELEASE_REPO}" --json tagName --jq .tagName)"
-            else
-              # `releases/latest` redirects to `releases/tag/<tag>`. Following that
-              # redirect is not subject to the per-IP rate limit that the
-              # unauthenticated api.github.com has on shared runners.
-              latest_url="$(curl --fail --silent --show-error --retry 3 \
-                --output /dev/null --write-out '%{redirect_url}' \
-                "https://github.com/${RELEASE_REPO}/releases/latest")"
-              tag="${latest_url##*/}"
-            fi
-            if [[ -z "${tag}" ]]; then
-              echo "::error::Could not resolve the latest AI Scan release of ${RELEASE_REPO}"
-              exit 1
-            fi
-            echo "tools: latest is ${tag}"
-          fi
-          implementation_version="${tag}"
-
-          if [[ "${authenticated_download}" == "true" ]]; then
-            echo "tools: downloading the release from ${RELEASE_REPO} with authentication using gh"
-            GH_HOST=github.com gh release download "${tag}" \
-              --repo "${RELEASE_REPO}" \
-              --pattern "${tarball_basename}" \
-              --output "${tarball}"
-          else
-            echo "tools: downloading the release from ${RELEASE_REPO} using curl"
-            curl --fail --silent --show-error --location --retry 3 --output "${tarball}" \
-              "https://github.com/${RELEASE_REPO}/releases/download/${tag}/${tarball_basename}"
-          fi
-        fi
-
-        if ! bun_version="$(tar -xJOf "${tarball}" ./ai-scan-bun-version)"; then
-          echo "::error::AI Scan archive ${tarball} does not contain a readable ai-scan-bun-version stamp"
-          exit 1
-        fi
-        if [[ ! "${bun_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          echo "::error::AI Scan archive ${tarball} contains an invalid Bun version: ${bun_version}"
-          exit 1
-        fi
-
-        {
-          echo "tarball=${tarball}"
-          echo "bun-version=${bun_version}"
-          echo "implementation-version=${implementation_version}"
-          echo "action-started-at=${action_started_at}"
-        } >>"${GITHUB_OUTPUT}"
-
-    - name: Set up Node.js for Copilot CLI
-      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-      with:
-        node-version: 22
-
-    # AI Scan ships as a JavaScript bundle rather than a self-contained
-    # executable, so the runtime it needs is downloaded here from Bun's own
-    # upstream instead of being redistributed inside our release asset.
-    #
-    # The archive records the Bun version that built the bundle. Resolve that
-    # version before setup so independently released tools assets remain
-    # compatible with action versions already in use.
+    # TODO(bun-compat): Remove this step after production bundles use Node.
+    # Bundles built before the switch to Node.js contain `argus.js`, which
+    # runs on Bun. Such an archive records the Bun version that built it,
+    # so this sets up that exact version. Node bundles (`argus.mjs`) do not
+    # need Bun.
     - name: Set up Bun for AI Scan
+      if: steps.resolve.outputs.runtime == 'bun'
       uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
       with:
         bun-version: ${{ steps.resolve.outputs.bun-version }}
@@ -142,11 +81,14 @@ runs:
       shell: bash
       env:
         ARGUS_TARBALL: ${{ steps.resolve.outputs.tarball }}
+        ARGUS_RUNTIME: ${{ steps.resolve.outputs.runtime }}
+        ARGUS_BUN_VERSION: ${{ steps.resolve.outputs.bun-version }}
       run: |
         package_dir="$(bash "${GITHUB_ACTION_PATH}/unpack.sh" "${RUNNER_TEMP}" "${ARGUS_TARBALL}")"
         echo "package-dir=${package_dir}" >>"${GITHUB_OUTPUT}"
 
-    - name: Run AI Scan
+    - id: run-ai-scan
+      name: Run AI Scan
       shell: bash
       env:
         # The runner exports the repository, ref, SHA, and workspace.
@@ -157,15 +99,38 @@ runs:
         ARGUS_COPILOT_TOKEN: ${{ inputs.copilot-token }}
         ARGUS_COPILOT_INTEGRATION_ID: ${{ inputs.copilot-integration-id }}
         ARGUS_PACKAGE_DIR: ${{ steps.unpack.outputs.package-dir }}
+        ARGUS_RUNTIME: ${{ steps.resolve.outputs.runtime }}
         ARGUS_ACTION_VERSION: ${{ github.action_ref }}
         ARGUS_IMPLEMENTATION_VERSION: ${{ steps.resolve.outputs.implementation-version }}
         ARGUS_ACTION_STARTED_AT: ${{ steps.resolve.outputs.action-started-at }}
         ARGUS_SOURCE_ROOT: ${{ inputs.source-root }}
         ARGUS_BASELINE_REF: ${{ inputs.baseline-ref }}
+        ARGUS_TELEMETRY_OUTBOX: ${{ runner.temp }}/argus-telemetry-outbox
       # `GITHUB_ACTION_PATH` and `RUNNER_TEMP` are exported by the
       # runner, so they need no forwarding; only `ARGUS_PACKAGE_DIR` —
       # a step output rather than an ambient value — does.
       run: bash "${GITHUB_ACTION_PATH}/run.sh" "${RUNNER_TEMP}" "${ARGUS_PACKAGE_DIR}"
+
+    # Sends the final telemetry report of a scan that died before it could
+    # (killed, out of memory, timed out, cancelled). Composite actions have
+    # no `post:` hook, so this step only sees the outcome of the scan step
+    # above, not that of later steps of the calling job (github/argus#210).
+    # It sends to the destination the scan stored in the outbox, with the
+    # same token as the scan. It fails when the scan left no outbox
+    # (the scan never got going), which `continue-on-error` keeps from
+    # failing the action: telemetry must not.
+    - name: Finalize AI Scan telemetry
+      if: always() && steps.unpack.outcome == 'success'
+      shell: bash
+      continue-on-error: true
+      working-directory: ${{ steps.unpack.outputs.package-dir }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+        ARGUS_STEP_OUTCOME: ${{ steps.run-ai-scan.outcome }}
+        ARGUS_TELEMETRY_OUTBOX: ${{ runner.temp }}/argus-telemetry-outbox
+        ARGUS_RUNTIME: ${{ steps.resolve.outputs.runtime }}
+        ARGUS_ENTRY_POINT: ${{ steps.resolve.outputs.entry-point }}
+      run: '"${ARGUS_RUNTIME}" "${ARGUS_ENTRY_POINT}" finalize-telemetry'
 
     - name: Upload raw AI Scan findings
       if: always() && runner.debug == '1'
